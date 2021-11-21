@@ -33,6 +33,8 @@ enum
 
 Mousectl *mctl;
 Keyboardctl *kctl;
+Image *bg;
+Image *fg;
 Image *selbg;
 Image *mfg;
 Rectangle ir;
@@ -120,14 +122,14 @@ drawline(int i, int sel)
 
 	if(loff + i >= nlines)
 		return;
-	draw(screen, linerect(i), sel ? selbg : display->white, nil, ZP);
+	draw(screen, linerect(i), sel ? selbg : bg, nil, ZP);
 	p = addpt(lr.min, Pt(0, i * lh));
 	t = lines[loff + i].text;
 	while(*t){
 		if(*t == '\t')
-			p = string(screen, p, display->black, ZP, font, "    ");
+			p = string(screen, p, fg, ZP, font, "    ");
 		else
-			p = stringn(screen, p, display->black, ZP, font, t, 1);
+			p = stringn(screen, p, fg, ZP, font, t, 1);
 		t++;
 	}
 }
@@ -138,9 +140,9 @@ redraw(void)
 	Rectangle scrposr;
 	int i, h, y, ye;
 
-	draw(screen, screen->r, display->white, nil, ZP);
+	draw(screen, screen->r, bg, nil, ZP);
 	draw(screen, sr, mfg, nil, ZP);
-	border(screen, sr, 0, display->black, ZP);
+	border(screen, sr, 0, fg, ZP);
 	if(nlines > 0){
 		h = ((double)lcount / nlines) * Dy(sr);
 		y = ((double)loff / nlines) * Dy(sr);
@@ -150,7 +152,7 @@ redraw(void)
 		scrposr = Rect(sr.min.x + 1, sr.min.y + y + 1, sr.max.x - 1, ye);
 	}else
 		scrposr = insetrect(sr, -1);
-	draw(screen, scrposr, display->white, nil, ZP);
+	draw(screen, scrposr, bg, nil, ZP);
 	for(i = 0; i < lcount; i++)
 		drawline(i, i == lsel);
 	flushimage(display, 1);
@@ -331,6 +333,8 @@ threadmain(int argc, char **argv)
 	a[Emouse].c = mctl->c;
 	a[Eresize].c = mctl->resizec;
 	a[Ekeyboard].c = kctl->c;
+	bg = display->white;
+	fg = display->black;
 	selbg = allocimage(display, Rect(0,0,1,1), screen->chan, 1, 0xEFEFEFFF);
 	mfg = allocimage(display, Rect(0,0,1,1), screen->chan, 1, 0x999999FF);
 	loff = 0;
