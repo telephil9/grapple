@@ -318,10 +318,10 @@ threadmain(int argc, char **argv)
 	plumbfd = plumbopen("send", OWRITE|OCEXEC);
 	if(plumbfd < 0)
 		sysfatal("plumbopen: %r");
-	re = regcomp("([.a-zA-Z0-9_/+\\-]+(:[0-9]+)?)");
+	re = regcomp("([.a-zA-Z0-9_/+\\-]+:[0-9]+)");
 	getwd(pwd, sizeof pwd);
 	loadlines();
-	if(initdraw(nil, nil, "fm") < 0)
+	if(initdraw(nil, nil, "grapple") < 0)
 		sysfatal("initdraw: %r");
 	display->locking = 0;
 	if((mctl = initmouse(nil, screen)) == nil)
